@@ -1,0 +1,9 @@
+node_modules
+library.db
+library.db-journal
+data/
+.env
+*.log
+.DS_Store
+dist
+build
