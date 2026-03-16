@@ -1,3 +1,9 @@
+/*
+    usando fetch se il server risponde viene sempre considerato successo, anche se il codice di stato è 400 o 500,
+    con axios invece viene considerato errore se il codice di stato è fuori dall intervallo 200-299, 
+    quindi posso gestire gli errori direttamente nel catch del try-catch
+*/
+
 import axios from 'axios';
 
 

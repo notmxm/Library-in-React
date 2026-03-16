@@ -1,7 +1,5 @@
 
-
-
-export interface Author{
+export type Author = {
     id : number,
     name: string,
     createdAt: string,
@@ -20,19 +18,19 @@ che specifica la forma del messaggio */
 /* min lenght sarebbe 1, ma non si può fare con typescript direttamente 
 nella definizione del dto. Ci sono altre librerie esterne come zod che lo permettono */
 
-export interface CreateAuthorDto {
+export type CreateAuthorDto = {
     name: string
 }
 
 export type UpdateAuthorDto = CreateAuthorDto
 
-export interface MessageResponse {
+export type MessageResponse = {
     message: string
 }
 
 export type ApiErrorResponse = MessageResponse
 
-export interface AuthorBookResponse {
+export type AuthorBookResponse = {
     id: number,
     title: string,
     isbn: string | null,
@@ -57,13 +55,13 @@ export interface AuthorBookResponse {
 
 */
 
-export interface AuthorQueryParams {
+export type AuthorQueryParams = {
     page?: string,
     limit?: string,
     search?: string
 }
 
-export interface Pagination{
+export type Pagination = {
     page: number,
     limit: number,
     total: number,
@@ -83,12 +81,12 @@ export interface PaginatedResponse {
 }
 */
 
-export interface PaginatedResponse<T> {
+export type PaginatedResponse<T> = {
     data: T[],
     pagination: Pagination
 }
 
-export interface CreateBookDto {
+export type CreateBookDto = {
     authorId: number;
     authorName: string;  
     title: string;
@@ -103,13 +101,13 @@ export interface CreateBookDto {
     textReviewsCount?: number;
 }
 
-export interface Book extends CreateBookDto {
+export type Book = CreateBookDto & {
     id: number;
     createdAt: string;
     updatedAt: string;
 }
 
-export interface BookQueryParams {
+export type BookQueryParams = {
     page?: number;
     limit?: number;
     search?: string;

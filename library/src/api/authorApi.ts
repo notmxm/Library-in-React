@@ -3,7 +3,6 @@ import { apiClient, ApiError } from "./config";
 
 import type {
   Author,
-  Book,
   CreateAuthorDto,
   UpdateAuthorDto,
   PaginatedResponse,
