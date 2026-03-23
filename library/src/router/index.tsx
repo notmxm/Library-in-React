@@ -1,5 +1,5 @@
 import { createBrowserRouter} from 'react-router-dom';
-import { BookListPage } from '../pages/BooksListPage';
+import { BooksListPage } from '../pages/BooksListPage';
 
 
 // https://reactrouter.com/start/framework/routing
@@ -7,7 +7,7 @@ import { BookListPage } from '../pages/BooksListPage';
 export const router = createBrowserRouter([
   {
     path: '/books',
-    element: <BookListPage />,
+    element: <BooksListPage />,
   }
   
 ]);

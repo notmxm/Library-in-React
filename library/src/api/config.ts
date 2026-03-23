@@ -8,7 +8,7 @@ import axios from 'axios';
 
 
 //https://vite.dev/guide/env-and-mode
-const BASE_URL = import.meta.env.BASE_URL ?? "http://localhost:3000"
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000"
 
 
 export class ApiError extends Error {
