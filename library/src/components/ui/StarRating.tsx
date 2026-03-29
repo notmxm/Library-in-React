@@ -1,9 +1,10 @@
 type StarRatingProps = {
   rating: number | undefined;
+  ratingsCount?: number;
   showValue?: boolean;
 };
 
-export function StarRating({ rating, showValue = true }: StarRatingProps) {
+export function StarRating({ rating, ratingsCount, showValue = true }: StarRatingProps) {
   if (rating === null || rating === undefined) {
     return <span className="text-sm text-slate-400">Nessun voto</span>;
   }
@@ -18,13 +19,19 @@ export function StarRating({ rating, showValue = true }: StarRatingProps) {
         {'★'.repeat(fullStars).split('').map((s, i) => (
           <span key={`f-${i}`} className="text-amber-400">{s}</span>
         ))}
-        {hasHalf && <span className="text-amber-400">⯨</span>}
+        {hasHalf && <span className="text-amber-400">⯪</span>}
         {'★'.repeat(emptyStars).split('').map((s, i) => (
           <span key={`e-${i}`} className="text-slate-300">{s}</span>
         ))}
       </span>
       {showValue && (
         <span className="text-sm text-slate-500">{rating.toFixed(2)}</span>
+      )}
+
+      {ratingsCount !== undefined && (
+        <span className="text-xs text-slate-400">
+          ({ratingsCount.toLocaleString()})
+        </span>
       )}
     </span>
   );

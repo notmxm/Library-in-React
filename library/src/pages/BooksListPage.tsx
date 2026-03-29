@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { Book, Pagination } from "../types";
 import { bookApi } from "../api/bookApi";
 import { Spinner } from "../components/ui/Spinner";
 import { Button } from "../components/ui/Button";
 import { StarRating } from "../components/ui/StarRating";
+import { Pagination as PaginationControl } from "../components/ui/Pagination";
+import { useDebounce } from "../hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -17,15 +19,13 @@ export function BooksListPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [searchInput, setSearchInput] = useState("");
-  // +debounce
+  const debouncedSearch = useDebounce(searchInput, 400);
 
   const [page, setPage] = useState(1);
 
   // passare una funzione dentro un'altra
   // funzione per farla eseguire più tardi si chiama Callback.
   useEffect(() => {
-    let isMounted = true;
-
     setIsLoading(true);
     setError(null);
 
@@ -33,50 +33,42 @@ export function BooksListPage() {
       .getAll({
         page,
         limit: ITEMS_PER_PAGE,
-        search: searchInput || undefined,
+        search: debouncedSearch || undefined,
       })
       .then((result) => {
-        if (isMounted) {
-          setBooks(result.data || []);
-          setPagination(result.pagination);
-        }
+        setBooks(result.data || []);
+        setPagination(result.pagination);
       })
       .catch((err: Error) => {
-        if (isMounted) {
-          setError(err.message);
-        }
+        setError(err.message);
       })
       .finally(() => {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       });
 
-    return () => {
-      isMounted = false;
-    };
-  }, [page, searchInput]);
+    return () => {};
+  }, [page, debouncedSearch]);
 
   useEffect(() => {
     setPage(1);
-  }, [searchInput]);
+  }, [debouncedSearch]);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Libri</h1>
           {pagination && (
             <p className="mt-1 text-sm text-slate-500">
-              {pagination.total} libri nel catalogo
+              {pagination.total.toLocaleString()} libri nel catalogo
             </p>
           )}
         </div>
         <Button onClick={() => navigate("/books/new")}>Aggiungi libro</Button>
       </div>
 
-      {/* Ricerca */}
+      {/* search */}
       <div className="relative">
         <svg
           className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
@@ -99,7 +91,7 @@ export function BooksListPage() {
         />
       </div>
 
-      {/* Griglia libri */}
+      {/* books grid */}
       {isLoading ? (
         <Spinner />
       ) : books.length === 0 ? (
@@ -109,7 +101,7 @@ export function BooksListPage() {
           </p>
           {searchInput && (
             <p className="mt-1 text-sm text-slate-500">
-              Nessun risultato per &ldquo;{searchInput}&rdquo;
+              Nessun risultato per "{searchInput}"
             </p>
           )}
           <Button
@@ -122,11 +114,21 @@ export function BooksListPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-4 gap-4">
           {books.map((book) => (
             <BookCard key={book.id} book={book} />
           ))}
         </div>
+      )}
+
+      {pagination && pagination.totalPages > 1 && (
+        <PaginationControl
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          total={pagination.total}
+          limit={ITEMS_PER_PAGE}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );
@@ -137,21 +139,21 @@ type BookCardProps = {
 };
 
 function BookCard({ book }: BookCardProps) {
+  const navigate = useNavigate();
   return (
-    <Link
-      to={`/books/${book.id}`}
-      className="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm
+    <div
+      onClick={() => navigate(`/books/${book.id}`)}
+      className="cursor-pointer group flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm
                  transition-all duration-150 hover:border-indigo-200 hover:shadow-md"
     >
       <h3 className="line-clamp-2 font-semibold text-slate-900 group-hover:text-indigo-700 transition-colors">
         {book.title}
       </h3>
 
-      <p
-        className="mt-1 text-sm text-indigo-600 hover:underline"
-        
-      >
-        {/* Event Bubbling https://shiftasia.com/community/javascript-how-event-bubbling-and-event-capturing-work/#:~:text=Event%20bubbling%20in%20Javascript%20is,triggered%20by%20their%20child%20elements.
+      <p className="mt-1 text-sm text-indigo-600 hover:underline">
+        {/* 
+
+            Event Bubbling https://shiftasia.com/community/javascript-how-event-bubbling-and-event-capturing-work/#:~:text=Event%20bubbling%20in%20Javascript%20is,triggered%20by%20their%20child%20elements.
 
             React event propagation (event bubbling) https://react.dev/learn/responding-to-events#event-propagation
 
@@ -169,7 +171,10 @@ function BookCard({ book }: BookCardProps) {
 
       <div className="mt-3 flex flex-col gap-1.5">
         {book.averageRating !== null && (
-          <StarRating rating={book.averageRating} />
+          <StarRating
+            rating={book.averageRating}
+            ratingsCount={book.ratingsCount}
+          />
         )}
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
           {book.languageCode && (
@@ -179,12 +184,12 @@ function BookCard({ book }: BookCardProps) {
           )}
           {book.numPages && <span>{book.numPages} pag.</span>}
           {book.publisher && (
-            <span className="truncate max-w-[120px]" title={book.publisher}>
+            <span className="truncate max-w-[200px]" title={book.publisher}>
               {book.publisher}
             </span>
           )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
