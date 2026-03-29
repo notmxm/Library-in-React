@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import type { Book, Pagination } from "../types";
-import { bookApi } from "../api/bookApi";
-import { Spinner } from "../components/ui/Spinner";
-import { Button } from "../components/ui/Button";
-import { StarRating } from "../components/ui/StarRating";
-import { Pagination as PaginationControl } from "../components/ui/Pagination";
-import { useDebounce } from "../hooks/useDebounce";
+import type { Book, Pagination } from "../../types";
+import { bookApi } from "../../api/bookApi";
+import { Spinner } from "../../components/ui/Spinner";
+import { Button } from "../../components/ui/Button";
+import { StarRating } from "../../components/ui/StarRating";
+import { Pagination as PaginationControl } from "../../components/ui/Pagination";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const ITEMS_PER_PAGE = 24;
 
