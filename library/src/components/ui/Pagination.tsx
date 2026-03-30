@@ -31,7 +31,7 @@ export function Pagination({
         <p className="text-sm text-slate-600">
           Risultati{" "}
           <span className="font-medium text-slate-900">
-            {rangeStart}–{rangeEnd}
+            {rangeStart}-{rangeEnd}
           </span>{" "}
           di <span className="font-medium text-slate-900">{total}</span>
         </p>
