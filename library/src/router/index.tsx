@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate} from 'react-router-dom';
 import { BooksListPage } from '../pages/books/BooksListPage';
 import { Layout } from '../components/layout/Layout';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { BookDetailPage } from '../pages/books/BookDetailPage';
 
 
 // https://reactrouter.com/start/framework/routing
@@ -16,6 +17,7 @@ export const router = createBrowserRouter([
     children : [
       { index: true, element: <Navigate to="/books" replace /> },
       { path: 'books', element: <BooksListPage /> },
+      {path: `books/:id`, element: <BookDetailPage/>},
       { path: '*', element: <NotFoundPage /> }
     ]
   }

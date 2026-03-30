@@ -7,6 +7,7 @@ import { Button } from "../../components/ui/Button";
 import { StarRating } from "../../components/ui/StarRating";
 import { Pagination as PaginationControl } from "../../components/ui/Pagination";
 import { useDebounce } from "../../hooks/useDebounce";
+import { ErrorMessage } from "../../components/ui/ErrorMessage";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -55,7 +56,7 @@ export function BooksListPage() {
 
   return (
     <div className="space-y-6">
-      {/* header */}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Libri</h1>
@@ -68,7 +69,7 @@ export function BooksListPage() {
         <Button onClick={() => navigate("/books/new")}>Aggiungi libro</Button>
       </div>
 
-      {/* search */}
+
       <div className="relative">
         <svg
           className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
@@ -91,7 +92,9 @@ export function BooksListPage() {
         />
       </div>
 
-      {/* books grid */}
+      <ErrorMessage message={error} />
+
+
       {isLoading ? (
         <Spinner />
       ) : books.length === 0 ? (

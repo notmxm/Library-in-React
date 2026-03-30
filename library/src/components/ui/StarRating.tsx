@@ -25,7 +25,7 @@ export function StarRating({ rating, ratingsCount, showValue = true }: StarRatin
         ))}
       </span>
       {showValue && (
-        <span className="text-sm text-slate-500">{rating.toFixed(2)}</span>
+        <span className="text-sm text-slate-600">{rating.toFixed(2)}</span>
       )}
 
       {ratingsCount !== undefined && (
