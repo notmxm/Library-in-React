@@ -183,7 +183,7 @@ export function BookDetailPage() {
         <div className="p-8">
           <ErrorMessage message={deleteError} />
 
-          <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+          <dl className="grid grid-cols-1 gap-x-6 gap-y-4">
             {filteredDetails.map(({ label, value }) => (
               <div
                 key={label}
@@ -202,7 +202,7 @@ export function BookDetailPage() {
       <ConfirmModal
         isOpen={showDeleteModal}
         title={`Eliminare "${book.title}"?`}
-        message="Questa azione è irreversibile. Il libro verrà eliminato definitivamente."
+        message="Questa azione è irreversibile."
         confirmLabel="Sì, elimina"
         onConfirm={handleDelete}
         onCancel={() => setShowDeleteModal(false)}
