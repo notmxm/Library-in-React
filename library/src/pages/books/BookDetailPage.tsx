@@ -1,27 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { bookApi } from "../../api/bookApi";
-import type { Book } from "../../types";
 import { Spinner } from "../../components/ui/Spinner";
 import { ErrorMessage } from "../../components/ui/ErrorMessage";
 import { Button } from "../../components/ui/Button";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { StarRating } from "../../components/ui/StarRating";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 
 export function BookDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const bookId = parseInt(id!, 10);
 
+  /*
   const [book, setBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  */
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  /*
   useEffect(() => {
     setIsLoading(true);
     setError(null);
@@ -40,7 +45,16 @@ export function BookDetailPage() {
 
     return () => {};
   }, [bookId]);
+  */
 
+  const {data: book, isLoading, error} = useQuery({
+    queryKey: ["book", bookId],
+    queryFn: () => bookApi.getById(bookId)
+  });
+
+  const errorMessage = error instanceof Error ? error.message : null;
+
+  /*
   async function handleDelete() {
     setIsDeleting(true);
     try {
@@ -54,6 +68,21 @@ export function BookDetailPage() {
       setShowDeleteModal(false);
     }
   }
+  */
+
+  const deleteMutation = useMutation({
+    mutationFn: () => bookApi.delete(bookId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["books"]});
+      queryClient.removeQueries({queryKey: ["book", bookId]});
+      navigate("/books", {replace: true});
+    },
+    onError: (err) => {
+      setDeleteError(err instanceof Error ? err.message : "Errore durante eliminazione");
+      setShowDeleteModal(false);
+    }
+  })
+
 
   if (isLoading) return <Spinner />;
 
@@ -66,7 +95,7 @@ export function BookDetailPage() {
         >
           Indietro
         </button>
-        <ErrorMessage message={error} />
+        <ErrorMessage message={errorMessage} />
       </div>
     );
   }
@@ -204,9 +233,9 @@ export function BookDetailPage() {
         title={`Eliminare "${book.title}"?`}
         message="Questa azione è irreversibile."
         confirmLabel="Sì, elimina"
-        onConfirm={handleDelete}
+        onConfirm={() => deleteMutation.mutate()}
         onCancel={() => setShowDeleteModal(false)}
-        isLoading={isDeleting}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

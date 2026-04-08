@@ -8,24 +8,37 @@ import { StarRating } from "../../components/ui/StarRating";
 import { Pagination as PaginationControl } from "../../components/ui/Pagination";
 import { useDebounce } from "../../hooks/useDebounce";
 import { ErrorMessage } from "../../components/ui/ErrorMessage";
+import { useQuery } from "@tanstack/react-query";
 
 const ITEMS_PER_PAGE = 24;
 
 export function BooksListPage() {
   const navigate = useNavigate();
 
-  const [books, setBooks] = useState<Book[]>([]);
-  const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  /*
 
+    pre react-query:
+    queste cose erano uno snapshot del server state,
+    portandosi dietro tutti i problemi di dover gestire un server state.
+    quindi boilerplate, mancanza di cache, dati vecchi, race conditions
+
+    Quindi si usa react per la UI e il client state
+    e invece reactquery per il server state.
+
+
+    const [books, setBooks] = useState<Book[]>([]);
+    const [pagination, setPagination] = useState<Pagination | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+  */
+
+
+  // questo invece rappresenta il client state
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearch = useDebounce(searchInput, 400);
-
   const [page, setPage] = useState(1);
 
-  // passare una funzione dentro un'altra
-  // funzione per farla eseguire più tardi si chiama Callback.
+  /*
   useEffect(() => {
     setIsLoading(true);
     setError(null);
@@ -49,10 +62,37 @@ export function BooksListPage() {
 
     return () => {};
   }, [page, debouncedSearch]);
+*/
 
+  /*
+    data è quello che bookapi.getall() mi restituisce
+
+    isLoading è true solo la prima volta che la query viene eseguita
+    e non ci sono ancora dati in cache.
+
+    error è la risposta di errore
+  */
+  const {data, isLoading, error} = useQuery({
+    queryKey: ["books", {page, search: debouncedSearch}],
+    queryFn: () =>
+      bookApi.getAll({
+        page,
+        limit: ITEMS_PER_PAGE,
+        search: debouncedSearch || undefined,
+      }),
+  });
+
+  const books = data?.data || [];
+  //null per adattarlo al conditional rendering
+  const pagination = data?.pagination || null;
+  const errorMessage = error instanceof Error ? error.message : null
+
+  // questo va bene perchè sto sincronizzando due client state
+  // ovvero la pagina e il search
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch]);
+
 
   return (
     <div className="space-y-6">
@@ -92,7 +132,7 @@ export function BooksListPage() {
         />
       </div>
 
-      <ErrorMessage message={error} />
+      <ErrorMessage message={errorMessage} />
 
 
       {isLoading ? (
