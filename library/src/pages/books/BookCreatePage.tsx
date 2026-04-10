@@ -14,7 +14,7 @@ export function BookCreatePage() {
 
   const { data: authorsData, isLoading: isLoadingAuthors, error: authorsError } = useQuery({
     queryKey: ['authors', 'all'],
-    queryFn: () => authorsApi.getAll({ limit: "1000" })
+    queryFn: () => authorsApi.getAll({ limit: 1000 })
   });
 
   const saveMutation = useMutation({
