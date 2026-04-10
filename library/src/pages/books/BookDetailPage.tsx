@@ -1,12 +1,10 @@
-import { useState} from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { bookApi } from "../../api/bookApi";
 import { Spinner } from "../../components/ui/Spinner";
 import { ErrorMessage } from "../../components/ui/ErrorMessage";
-import { Button } from "../../components/ui/Button";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
-import { StarRating } from "../../components/ui/StarRating";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 
 export function BookDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,83 +13,50 @@ export function BookDetailPage() {
 
   const bookId = parseInt(id!, 10);
 
-  /*
-  const [book, setBook] = useState<Book | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [isDeleting, setIsDeleting] = useState(false);
-  */
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  /*
-  useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-
-    bookApi
-      .getById(bookId)
-      .then((data) => {
-        setBook(data);
-      })
-      .catch((err: Error) => {
-        setError(err.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-
-    return () => {};
-  }, [bookId]);
-  */
-
-  const {data: book, isLoading, error} = useQuery({
+  const {
+    data: book,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["book", bookId],
-    queryFn: () => bookApi.getById(bookId)
+    queryFn: () => bookApi.getById(bookId),
   });
 
-  const errorMessage = error instanceof Error ? error.message : null;
-
-  /*
-  async function handleDelete() {
-    setIsDeleting(true);
-    try {
-      await bookApi.delete(bookId);
-      navigate("/books", { replace: true });
-    } catch (err: unknown) {
-      setDeleteError(
-        err instanceof Error ? err.message : "Errore durante l'eliminazione",
-      );
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-    }
-  }
-  */
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : null;
 
   const deleteMutation = useMutation({
     mutationFn: () => bookApi.delete(bookId),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["books"]});
-      queryClient.removeQueries({queryKey: ["book", bookId]});
-      navigate("/books", {replace: true});
+      queryClient.invalidateQueries({ queryKey: ["books"] });
+      queryClient.removeQueries({ queryKey: ["book", bookId] });
+      navigate("/books", { replace: true });
     },
     onError: (err) => {
-      setDeleteError(err instanceof Error ? err.message : "Errore durante eliminazione");
+      setDeleteError(
+        err instanceof Error ? err.message : "Errore durante l'eliminazione",
+      );
       setShowDeleteModal(false);
-    }
-  })
+    },
+  });
 
+  const isDeleting = deleteMutation.isPending;
 
   if (isLoading) return <Spinner />;
 
-  if (error) {
+  if (errorMessage) {
     return (
-      <div className="space-y-4">
+      <div className="mb-4">
         <button
           onClick={() => navigate(-1)}
-          className="text-sm text-slate-500 hover:text-slate-700"
+          className="text-gray-500 hover:text-gray-700 underline mb-4"
         >
           Indietro
         </button>
@@ -130,7 +95,7 @@ export function BookDetailPage() {
       : null,
     book.ratingsCount
       ? {
-          label: "Votazioni",
+          label: "votazioni",
           value: book.ratingsCount.toLocaleString("it-IT"),
         }
       : null,
@@ -161,81 +126,69 @@ export function BookDetailPage() {
   const filteredDetails = details.filter(Boolean) as DetailItem[];
 
   return (
-    <div className="space-y-8">
+    <div className="p-8">
       <Link
         to="/books"
-        className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-indigo-600"
+        className="text-indigo-600 hover:underline mb-6 inline-block"
       >
-        Tutti i libri
+        Torna ai libri
       </Link>
 
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 px-8 py-8 text-white">
-          <div className="flex flex-col gap-4">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold leading-tight">
-                {book.title}
-              </h1>
-              <Link
-                to={`/authors/${book.authorId}`}
-                className="mt-2 inline-block text-indigo-200 hover:text-white transition-colors"
-              >
-                {book.authorName}
-              </Link>
-              {book.averageRating !== null && (
-                <div className="mt-3">
-                  <StarRating rating={book.averageRating} />
-                </div>
-              )}
-            </div>
+      <div className="bg-white border border-gray-300 p-6 shadow-sm">
+        <div className="flex justify-between items-start border-b border-gray-200 pb-6 mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {book.title}
+            </h1>
+            {book.averageRating !== null && (
+              <div className="mt-2 text-gray-600 text-sm">
+                Valutazione media: {book.averageRating} / 5
+              </div>
+            )}
+          </div>
 
-            <div className="flex gap-2 flex-shrink-0">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => navigate(`/books/${bookId}/edit`)}
-                className="bg-white/10 border-white/30 text-white hover:bg-white/20"
-              >
-                Modifica
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => setShowDeleteModal(true)}
-              >
-                Elimina
-              </Button>
-            </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate(`/books/${bookId}/edit`)}
+              className="px-4 py-2 bg-indigo-100 text-indigo-700 font-semibold hover:bg-indigo-200"
+            >
+              Modifica
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="px-4 py-2 bg-red-600 text-white font-semibold hover:bg-red-700"
+            >
+              Elimina
+            </button>
           </div>
         </div>
 
-        <div className="p-8">
-          <ErrorMessage message={deleteError} />
+        {deleteError && (
+          <div className="mb-6">
+            <ErrorMessage message={deleteError} />
+          </div>
+        )}
 
-          <dl className="grid grid-cols-1 gap-x-6 gap-y-4">
-            {filteredDetails.map(({ label, value }) => (
-              <div
-                key={label}
-                className="border-b border-slate-100 pb-4 last:border-0"
-              >
-                <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                  {label}
-                </dt>
-                <dd className="mt-1 text-sm text-slate-900">{value}</dd>
+        <div className="grid grid-cols-2 gap-6">
+          {filteredDetails.map(({ label, value }) => (
+            <div key={label} className="border-b border-gray-100 pb-2">
+              <div className="text-sm uppercase font-bold text-gray-500 mb-1">
+                {label}
               </div>
-            ))}
-          </dl>
+              <div className="text-gray-900 font-medium">{value}</div>
+            </div>
+          ))}
         </div>
       </div>
 
       <ConfirmModal
         isOpen={showDeleteModal}
         title={`Eliminare "${book.title}"?`}
-        message="Questa azione è irreversibile."
+        message="Questa azione è irreversibile. Il libro verrà eliminato definitivamente."
         confirmLabel="Sì, elimina"
         onConfirm={() => deleteMutation.mutate()}
         onCancel={() => setShowDeleteModal(false)}
-        isLoading={deleteMutation.isPending}
+        isLoading={isDeleting}
       />
     </div>
   );

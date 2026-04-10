@@ -56,8 +56,8 @@ export type AuthorBookResponse = {
 */
 
 export type AuthorQueryParams = {
-    page?: string,
-    limit?: string,
+    page?: number,
+    limit?: number,
     search?: string
 }
 
