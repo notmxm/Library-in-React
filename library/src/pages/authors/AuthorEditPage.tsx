@@ -37,7 +37,7 @@ export function AuthorEditPage() {
     const msg = loadError instanceof Error ? loadError.message : 'Errore durante il caricamento dell\'autore';
     return (
       <div className="max-w-2xl mx-auto space-y-4">
-        <button onClick={() => navigate(-1)} className="text-blue-500">← Indietro</button>
+        <button onClick={() => navigate(-1)} className="text-blue-500"> Indietro</button>
         <ErrorMessage message={msg} />
       </div>
     );

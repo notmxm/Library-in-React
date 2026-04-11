@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { bookApi } from '../../api/bookApi';
-import { authorsApi } from '../../api/authorApi';
 import { Spinner } from '../../components/ui/Spinner';
 import { ErrorMessage } from '../../components/ui/ErrorMessage';
 import { BookForm, type BookFormData } from './BookForm';
@@ -14,11 +13,6 @@ export function BookEditPage() {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const bookId = parseInt(id!, 10);
-
-  const { data: authorsData, isLoading: isLoadingAuthors, error: authorsError } = useQuery({
-    queryKey: ['authors', 'all'],
-    queryFn: () => authorsApi.getAll()
-  });
 
   const { data: book, isLoading: isLoadingBook, error: bookError } = useQuery({
     queryKey: ['book', bookId],
@@ -37,23 +31,24 @@ export function BookEditPage() {
     },
   });
 
-
-  const isLoading = isLoadingAuthors || isLoadingBook;
+  // Gestione caricamento ed errori globali
+  const isLoading = isLoadingBook;
   if (isLoading) return <Spinner />;
 
-  const error = authorsError || bookError;
+  const error = bookError;
   if (error || !book) {
     const msg = error instanceof Error ? error.message : 'Errore durante il caricamento del libro';
     return (
       <div className="space-y-4">
         <button onClick={() => navigate(-1)} className="text-sm text-slate-500 hover:text-slate-700">
-           Indietro
+          ← Indietro
         </button>
         <ErrorMessage message={msg} />
       </div>
     );
   }
 
+  // Helper per formattare la data nel formato YYYY-MM-DD richiesto dall'input HTML
   function formatDateForInput(dateStr: string | null | undefined): string {
     if (!dateStr) return '';
     try {
@@ -79,9 +74,6 @@ export function BookEditPage() {
     publisher: book.publisher ?? '',
   };
 
-  const authors = authorsData?.data || [];
-
-
   return (
     <div className="space-y-6">
       <div>
@@ -89,7 +81,7 @@ export function BookEditPage() {
       </div>
       <BookForm
         initialData={initialFormData}
-        authors={authors}
+        initialAuthorName={book.authorName}
         serverError={serverError}
         isSaving={saveMutation.isPending}
         onSubmit={(dto) => saveMutation.mutate(dto)}
