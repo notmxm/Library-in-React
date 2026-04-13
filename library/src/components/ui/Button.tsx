@@ -1,7 +1,7 @@
 import type React from "react";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "danger" | "ghost";
+  variant?: "primary" | "secondary" | "danger";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
 };
@@ -13,8 +13,7 @@ const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
     "bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-400 border border-slate-300",
   danger:
     "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 border border-transparent",
-  ghost:
-    "bg-transparent text-slate-600 hover:bg-slate-100 focus-visible:ring-slate-400 border border-transparent",
+  
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {

@@ -216,13 +216,13 @@ export function BookForm({
         </div>
 
         <div className="flex flex-col">
-          <label className="font-semibold text-gray-700 mb-1">N° Votazioni:</label>
+          <label className="font-semibold text-gray-700 mb-1">N Votazioni:</label>
           <input type="number" min="0" value={formData.ratingsCount} onChange={(e) => handleChange('ratingsCount', e.target.value)} className="border border-gray-300 rounded-md p-2 focus:border-blue-500 focus:outline-none" />
         </div>
       </div>
 
       <div className="flex flex-col w-1/3">
-        <label className="font-semibold text-gray-700 mb-1">N° Recensioni Testuali:</label>
+        <label className="font-semibold text-gray-700 mb-1">N Recensioni Testuali:</label>
         <input type="number" min="0" value={formData.textReviewsCount} onChange={(e) => handleChange('textReviewsCount', e.target.value)} className="border border-gray-300 rounded-md p-2 focus:border-blue-500 focus:outline-none" />
       </div>
 

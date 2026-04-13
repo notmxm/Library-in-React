@@ -56,7 +56,7 @@ export function AuthorListPage() {
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Cerca autori per nome..."
+          placeholder="Cerca autori"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           className="w-full border border-gray-300 p-3 rounded-md focus:border-blue-500 focus:outline-none"

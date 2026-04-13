@@ -47,7 +47,6 @@ export function BookDetailPage() {
     },
   });
 
-  const isDeleting = deleteMutation.isPending;
 
   if (isLoading) return <Spinner />;
 
@@ -184,11 +183,9 @@ export function BookDetailPage() {
       <ConfirmModal
         isOpen={showDeleteModal}
         title={`Eliminare "${book.title}"?`}
-        message="Questa azione è irreversibile. Il libro verrà eliminato definitivamente."
         confirmLabel="Sì, elimina"
         onConfirm={() => deleteMutation.mutate()}
         onCancel={() => setShowDeleteModal(false)}
-        isLoading={isDeleting}
       />
     </div>
   );
