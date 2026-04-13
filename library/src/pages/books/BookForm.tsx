@@ -35,12 +35,10 @@ export const EMPTY_FORM: BookFormData = {
   publisher: '',
 };
 
-interface BookFormProps {
+type BookFormProps = {
   initialData: BookFormData;
   initialAuthorName?: string;
   onSubmit: (data: any) => void;
-  isSaving: boolean;
-  serverError: string | null;
   submitLabel: string;
 }
 
@@ -48,8 +46,6 @@ export function BookForm({
   initialData, 
   initialAuthorName = '', 
   onSubmit, 
-  isSaving, 
-  serverError,
   submitLabel
 }: BookFormProps) {
   const [formData, setFormData] = useState<BookFormData>(initialData);
@@ -114,14 +110,8 @@ export function BookForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md space-y-5">
+    <form onSubmit={handleSubmit} className="bg-white p-8 rounded-md border border-gray-300 space-y-5">
       <h2 className="text-2xl font-bold text-gray-800 border-b pb-2">Dettagli Libro</h2>
-
-      {serverError && (
-        <div className="p-3 bg-red-100 text-red-700 border border-red-400 rounded-md">
-          Errore Server: {serverError}
-        </div>
-      )}
 
       <div className="flex flex-col">
         <label className="font-semibold text-gray-700 mb-1">Titolo libro:</label>
@@ -135,7 +125,7 @@ export function BookForm({
       </div>
 
       <div className="flex flex-col relative">
-        <label className="font-semibold text-gray-700 mb-1">Autore: *</label>
+        <label className="font-semibold text-gray-700 mb-1">Autore:</label>
         <input
           type="text"
           value={authorSearch}
@@ -151,7 +141,7 @@ export function BookForm({
         />
 
         {showDropdown && authorSearch.length > 0 && (
-          <div className="absolute top-[72px] left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto w-full">
+          <div className="absolute top-18 left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto w-full">
             { authors.length > 0 ? (
               <ul>
                 {authors.map((a) => (
@@ -240,17 +230,15 @@ export function BookForm({
         <button 
           type="button" 
           onClick={() => window.history.back()} 
-          disabled={isSaving} 
           className="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors"
         >
           Annulla
         </button>
         <button 
-          type="submit" 
-          disabled={isSaving}
+          type="submit"
           className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors disabled:bg-blue-300"
         >
-          {isSaving ? 'Salvataggio...' : submitLabel}
+          {submitLabel}
         </button>
       </div>
     </form>

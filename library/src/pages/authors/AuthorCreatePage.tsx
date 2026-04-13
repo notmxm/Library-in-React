@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { authorsApi } from '../../api/authorApi';
@@ -7,7 +6,6 @@ import { AuthorForm, EMPTY_FORM } from './AuthorForm';
 export function AuthorCreatePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const saveMutation = useMutation({
     mutationFn: (dto: { name: string }) => authorsApi.create(dto),
@@ -15,9 +13,6 @@ export function AuthorCreatePage() {
       queryClient.invalidateQueries({ queryKey: ['authors'] });
       navigate(`/authors/${data.id}`);
     },
-    onError: (err) => {
-      setServerError(err instanceof Error ? err.message : 'Errore sconosciuto');
-    }
   });
 
   return (
@@ -30,11 +25,8 @@ export function AuthorCreatePage() {
       </div>
       <AuthorForm
         initialData={EMPTY_FORM}
-        serverError={serverError}
-        isSaving={saveMutation.isPending}
         onSubmit={(dto) => saveMutation.mutate(dto)}
         submitLabel="Crea autore"
-        onCancel={() => navigate('/authors')}
       />
     </div>
   );

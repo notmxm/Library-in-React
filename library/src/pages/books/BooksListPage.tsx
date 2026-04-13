@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import type { Book, Pagination } from "../../types";
+import type { Book } from "../../types";
 import { bookApi } from "../../api/bookApi";
 import { Spinner } from "../../components/ui/Spinner";
 import { Button } from "../../components/ui/Button";
@@ -227,7 +227,7 @@ function BookCard({ book }: BookCardProps) {
           )}
           {book.numPages && <span>{book.numPages} pag.</span>}
           {book.publisher && (
-            <span className="truncate max-w-[200px]" title={book.publisher}>
+            <span className="truncate max-w-50" title={book.publisher}>
               {book.publisher}
             </span>
           )}

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { bookApi } from '../../api/bookApi';
@@ -10,7 +9,6 @@ export function BookEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const bookId = parseInt(id!, 10);
 
@@ -26,12 +24,8 @@ export function BookEditPage() {
       queryClient.invalidateQueries({ queryKey: ['book', bookId] });
       navigate(`/books/${bookId}`);
     },
-    onError: (err) => {
-      setServerError(err instanceof Error ? err.message : 'Errore sconosciuto');
-    },
   });
 
-  // Gestione caricamento ed errori globali
   const isLoading = isLoadingBook;
   if (isLoading) return <Spinner />;
 
@@ -41,14 +35,14 @@ export function BookEditPage() {
     return (
       <div className="space-y-4">
         <button onClick={() => navigate(-1)} className="text-sm text-slate-500 hover:text-slate-700">
-          ← Indietro
+          Indietro
         </button>
         <ErrorMessage message={msg} />
       </div>
     );
   }
 
-  // Helper per formattare la data nel formato YYYY-MM-DD richiesto dall'input HTML
+ 
   function formatDateForInput(dateStr: string | null | undefined): string {
     if (!dateStr) return '';
     try {
@@ -82,8 +76,6 @@ export function BookEditPage() {
       <BookForm
         initialData={initialFormData}
         initialAuthorName={book.authorName}
-        serverError={serverError}
-        isSaving={saveMutation.isPending}
         onSubmit={(dto) => saveMutation.mutate(dto)}
         submitLabel="Salva Modifiche"
       />
