@@ -14,7 +14,7 @@ export function ErrorMessage({
   return (
     <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
       <svg
-        className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500"
+        className="mt-0.5 h-5 w-5 shrink-0 text-red-500"
         viewBox="0 0 20 20"
         fill="currentColor"
       >
