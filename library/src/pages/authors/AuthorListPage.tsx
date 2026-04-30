@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { authorsApi } from '../../api/authorApi';
 import type { Author } from '../../types';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -14,10 +14,23 @@ const ITEMS_PER_PAGE = 20;
 
 export function AuthorListPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [searchInput, setSearchInput] = useState('');
+  const searchParam = searchParams.get('search') || '';
+  const page = parseInt(searchParams.get('page') || '1', 10) || 1;
+
+  const [searchInput, setSearchInput] = useState(searchParam);
+  useEffect(() => {
+    setSearchInput(searchParam);
+  }, [searchParam]);
+
   const debouncedSearch = useDebounce(searchInput, 400);
-  const [page, setPage] = useState(1);
+   const setPage = (newPage: number) => {
+    setSearchParams((prev) => {
+      prev.set('page', newPage.toString());
+      return prev;
+    });
+  };
 
 
   const { data, isLoading, error } = useQuery({
@@ -31,8 +44,20 @@ export function AuthorListPage() {
 
 
   useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch]);
+    setSearchParams((prev) => {
+      const currentSearch = prev.get('search') || '';
+      if (currentSearch === debouncedSearch) return prev;
+
+      if (debouncedSearch) {
+        prev.set('search', debouncedSearch);
+      } else {
+        prev.delete('search');
+      }
+      prev.set('page', '1');
+      return prev;
+    }, { replace: true });
+  }, [debouncedSearch, setSearchParams]);
+
 
 
   return (

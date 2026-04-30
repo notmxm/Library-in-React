@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Book } from "../../types";
 import { bookApi } from "../../api/bookApi";
 import { Spinner } from "../../components/ui/Spinner";
@@ -14,7 +14,7 @@ const ITEMS_PER_PAGE = 24;
 
 export function BooksListPage() {
   const navigate = useNavigate();
-
+  const [searchParams, setSearchParams] = useSearchParams();
   /*
 
     pre react-query:
@@ -34,9 +34,21 @@ export function BooksListPage() {
 
 
   // questo invece rappresenta il client state
-  const [searchInput, setSearchInput] = useState("");
+  const searchParam = searchParams.get("search") || "";
+  const page = parseInt(searchParams.get("page") || "1", 10) || 1;
+
+  const [searchInput, setSearchInput] = useState(searchParam);
+  useEffect(() => {
+    setSearchInput(searchParam);
+  }, [searchParam]);
+
   const debouncedSearch = useDebounce(searchInput, 400);
-  const [page, setPage] = useState(1);
+  const setPage = (newPage: number) => {
+    setSearchParams((prev) => {
+      prev.set("page", newPage.toString());
+      return prev;
+    });
+  };
 
   /*
   useEffect(() => {
@@ -90,8 +102,19 @@ export function BooksListPage() {
   // questo va bene perchè sto sincronizzando due client state
   // ovvero la pagina e il search
   useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch]);
+    setSearchParams((prev) => {
+      const currentSearch = prev.get("search") || "";
+      if (currentSearch === debouncedSearch) return prev;
+
+      if (debouncedSearch) {
+        prev.set("search", debouncedSearch);
+      } else {
+        prev.delete("search");
+      }
+      prev.set("page", "1");
+      return prev;
+    }, { replace: true });
+  }, [debouncedSearch, setSearchParams]);
 
 
   return (
